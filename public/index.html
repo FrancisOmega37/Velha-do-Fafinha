@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Velha do Fafinha Online</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #0b0f16;
+      color: #f4f7fb;
+      display: flex;
+      justify-content: center;
+      padding: 20px 12px;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 520px;
+    }
+
+    .brand {
+      text-align: center;
+      margin: 10px 0 18px;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 30px;
+    }
+
+    .brand p {
+      margin: 6px 0 0;
+      color: #9ba7b7;
+    }
+
+    .card {
+      background: #131a24;
+      border: 1px solid #273242;
+      border-radius: 20px;
+      padding: 18px;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, .22);
+    }
+
+    label {
+      display: block;
+      margin: 8px 0 6px;
+      color: #b9c4d3;
+      font-size: 14px;
+    }
+
+    input {
+      width: 100%;
+      padding: 14px;
+      border-radius: 12px;
+      border: 1px solid #354153;
+      background: #0c121b;
+      color: white;
+      outline: none;
+      font-size: 16px;
+    }
+
+    input:focus {
+      border-color: #6d9cff;
+    }
+
+    button {
+      width: 100%;
+      border: 0;
+      border-radius: 12px;
+      padding: 14px;
+      margin-top: 10px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      background: #2f8cff;
+      color: white;
+    }
+
+    button.secondary {
+      background: #252f3d;
+    }
+
+    button.danger {
+      background: #8e3342;
+    }
+
+    button:disabled {
+      opacity: .45;
+      cursor: not-allowed;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .roomline {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      justify-content: center;
+      margin: 8px 0 15px;
+    }
+
+    .roomcode {
+      letter-spacing: 4px;
+      font-size: 22px;
+      font-weight: 800;
+      padding: 8px 12px;
+      background: #0b111a;
+      border: 1px solid #334052;
+      border-radius: 10px;
+    }
+
+    .players {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .player {
+      padding: 12px;
+      background: #0d141e;
+      border: 1px solid #2a3545;
+      border-radius: 12px;
+      text-align: center;
+    }
+
+    .player strong {
+      display: block;
+      font-size: 18px;
+      margin-bottom: 5px;
+    }
+
+    .player small {
+      display: block;
+      color: #8e9aac;
+      margin-top: 4px;
+    }
+
+    .turn {
+      text-align: center;
+      min-height: 24px;
+      color: #cbd5e1;
+      margin-bottom: 12px;
+    }
+
+    .board {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 9px;
+      width: min(92vw, 420px);
+      margin: 0 auto;
+    }
+
+    .cell {
+      aspect-ratio: 1;
+      padding: 0;
+      margin: 0;
+      border-radius: 16px;
+      background: #0c121b;
+      border: 2px solid #2b3747;
+      font-size: clamp(52px, 16vw, 82px);
+      line-height: 1;
+      font-weight: 900;
+      color: white;
+    }
+
+    .cell:hover:not(:disabled) {
+      background: #111a27;
+    }
+
+    .scores {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin: 16px 0 4px;
+      color: #c5cfdd;
+      flex-wrap: wrap;
+    }
+
+    .actions {
+      margin-top: 14px;
+    }
+
+    .message {
+      text-align: center;
+      min-height: 22px;
+      margin-top: 12px;
+      color: #ffb4b4;
+      font-size: 14px;
+    }
+
+    .hint {
+      color: #8996a8;
+      text-align: center;
+      font-size: 13px;
+      margin-top: 12px;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="app">
+
+  <div class="brand">
+    <h1>🎮 Velha do Fafinha</h1>
+    <p>Jogo da Velha online em tempo real</p>
+  </div>
+
+  <!-- TELA INICIAL -->
+
+  <section id="lobby" class="card">
+
+    <label for="name">Seu nome</label>
+
+    <input
+      id="name"
+      maxlength="20"
+      placeholder="Digite seu nome"
+      autocomplete="name"
+    >
+
+    <button id="create">
+      🎮 Criar uma sala
+    </button>
+
+    <div style="text-align:center;color:#7f8b9b;margin:14px 0;">
+      ou
+    </div>
+
+    <label for="room">
+      Código da sala
+    </label>
+
+    <input
+      id="room"
+      maxlength="5"
+      placeholder="Ex.: AB123"
+      autocomplete="off"
+    >
+
+    <button id="join">
+      🚪 Entrar na sala
+    </button>
+
+    <div id="lobbyMessage" class="message"></div>
+
+    <div class="hint">
+      Crie uma sala e envie o código para seu amigo.
+    </div>
+
+  </section>
+
+
+  <!-- TELA DO JOGO -->
+
+  <section id="game" class="card hidden">
+
+    <div class="roomline">
+
+      <span>Sala</span>
+
+      <span
+        id="roomCode"
+        class="roomcode"
+      >
+        -----
+      </span>
+
+    </div>
+
+
+    <div class="players">
+
+      <div class="player">
+
+        <strong>❌ X</strong>
+
+        <span id="playerX">
+          Aguardando...
+        </span>
+
+        <small id="statusX">
+          offline
+        </small>
+
+      </div>
+
+
+      <div class="player">
+
+        <strong>⭕ O</strong>
+
+        <span id="playerO">
+          Aguardando...
+        </span>
+
+        <small id="statusO">
+          offline
+        </small>
+
+      </div>
+
+    </div>
+
+
+    <div id="turn" class="turn">
+      Conectando...
+    </div>
+
+
+    <div
+      id="board"
+      class="board"
+    ></div>
+
+
+    <div class="scores">
+
+      <span>
+        ❌ <b id="scoreX">0</b>
+      </span>
+
+      <span>
+        Empates: <b id="scoreD">0</b>
+      </span>
+
+      <span>
+        ⭕ <b id="scoreO">0</b>
+      </span>
+
+    </div>
+
+
+    <div class="actions">
+
+      <button id="restart">
+        🔄 Nova partida
+      </button>
+
+      <button
+        id="copy"
+        class="secondary"
+      >
+        📋 Copiar código da sala
+      </button>
+
+      <button
+        id="resetScores"
+        class="danger"
+      >
+        🗑️ Zerar placar
+      </button>
+
+      <button
+        id="leave"
+        class="secondary"
+      >
+        🚪 Sair da sala
+      </button>
+
+    </div>
+
+
+    <div
+      id="gameMessage"
+      class="message"
+    ></div>
+
+  </section>
+
+</div>
+
+
+<!-- Socket.IO -->
+
+<script src="/socket.io/socket.io.js"></script>
+
+
+<script>
+
+  const socket = io();
+
+
+  const lobby =
+    document.getElementById("lobby");
+
+  const game =
+    document.getElementById("game");
+
+  const nameInput =
+    document.getElementById("name");
+
+  const roomInput =
+    document.getElementById("room");
+
+  const lobbyMessage =
+    document.getElementById("lobbyMessage");
+
+  const gameMessage =
+    document.getElementById("gameMessage");
+
+  const boardEl =
+    document.getElementById("board");
+
+  const turnEl =
+    document.getElementById("turn");
+
+
+  let mySymbol = null;
+
+  let currentRoom = null;
+
+  let state = null;
+
+
+  function setLobbyMessage(text) {
+
+    lobbyMessage.textContent =
+      text || "";
+
+  }
+
+
+  function setGameMessage(text) {
+
+    gameMessage.textContent =
+      text || "";
+
+  }
+
+
+  function playerName() {
+
+    return (
+      nameInput.value.trim() ||
+      "Jogador"
+    );
+
+  }
+
+
+  function showGame() {
+
+    lobby.classList.add("hidden");
+
+    game.classList.remove("hidden");
+
+  }
+
+
+  function showLobby() {
+
+    game.classList.add("hidden");
+
+    lobby.classList.remove("hidden");
+
+    setGameMessage("");
+
+  }
+
+
+  /*
+   * CRIAR SALA
+   */
+
+  document.getElementById("create").onclick =
+    () => {
+
+      setLobbyMessage("");
+
+      socket.emit(
+        "createRoom",
+        {
+          name: playerName()
+        },
+        (res) => {
+
+          if (!res?.ok) {
+
+            setLobbyMessage(
+              res?.error ||
+              "Não foi possível criar a sala."
+            );
+
+            return;
+
+          }
+
+
+          mySymbol =
+            res.symbol;
+
+          currentRoom =
+            res.code;
+
+          showGame();
+
+        }
+      );
+
+    };
+
+
+  /*
+   * ENTRAR NA SALA
+   */
+
+  document.getElementById("join").onclick =
+    () => {
+
+      setLobbyMessage("");
+
+      const code =
+        roomInput.value
+          .trim()
+          .toUpperCase();
+
+
+      if (!code) {
+
+        setLobbyMessage(
+          "Digite o código da sala."
+        );
+
+        return;
+
+      }
+
+
+      socket.emit(
+        "joinRoom",
+        {
+          name: playerName(),
+          code: code
+        },
+        (res) => {
+
+          if (!res?.ok) {
+
+            setLobbyMessage(
+              res?.error ||
+              "Não foi possível entrar."
+            );
+
+            return;
+
+          }
+
+
+          mySymbol =
+            res.symbol;
+
+          currentRoom =
+            res.code;
+
+          showGame();
+
+        }
+      );
+
+    };
+
+
+  /*
+   * RECEBER ESTADO DO JOGO
+   */
+
+  function render(s) {
+
+    state = s;
+
+
+    document.getElementById(
+      "roomCode"
+    ).textContent =
+      s.code;
+
+
+    document.getElementById(
+      "playerX"
+    ).textContent =
+      s.players.X ||
+      "Aguardando...";
+
+
+    document.getElementById(
+      "playerO"
+    ).textContent =
+      s.players.O ||
+      "Aguardando...";
+
+
+    document.getElementById(
+      "statusX"
+    ).textContent =
+      s.connected.X
+        ? "online"
+        : "offline";
+
+
+    document.getElementById(
+      "statusO"
+    ).textContent =
+      s.connected.O
+        ? "online"
+        : "offline";
+
+
+    document.getElementById(
+      "scoreX"
+    ).textContent =
+      s.scores.X;
+
+
+    document.getElementById(
+      "scoreO"
+    ).textContent =
+      s.scores.O;
+
+
+    document.getElementById(
+      "scoreD"
+    ).textContent =
+      s.scores.draws;
+
+
+    boardEl.innerHTML = "";
+
+
+    s.board.forEach(
+      (value, index) => {
+
+        const cell =
+          document.createElement(
+            "button"
+          );
+
+
+        cell.className =
+          "cell";
+
+
+        if (value === "X") {
+
+          cell.textContent = "❌";
+
+        }
+        else if (value === "O") {
+
+          cell.textContent = "⭕";
+
+        }
+        else {
+
+          cell.textContent = "";
+
+        }
+
+
+        cell.disabled =
+          !!value ||
+          !!s.winner ||
+          s.draw ||
+          !s.players.X ||
+          !s.players.O ||
+          s.turn !== mySymbol;
+
+
+        cell.onclick = () => {
+
+          socket.emit(
+            "move",
+            {
+              index: index
+            },
+            (res) => {
+
+              if (!res?.ok) {
+
+                setGameMessage(
+                  res?.error ||
+                  "Jogada não permitida."
+                );
+
+              }
+
+            }
+          );
+
+        };
+
+
+        boardEl.appendChild(cell);
+
+      }
+    );
+
+
+    /*
+     * MENSAGEM DA VEZ
+     */
+
+    if (
+      !s.players.X ||
+      !s.players.O
+    ) {
+
+      turnEl.textContent =
+        "⏳ Aguardando o segundo jogador...";
+
+    }
+
+    else if (s.winner) {
+
+      const winnerName =
+        s.winner === "X"
+          ? s.players.X
+          : s.players.O;
+
+
+      turnEl.textContent =
+        `🏆 ${winnerName} venceu!`;
+
+    }
+
+    else if (s.draw) {
+
+      turnEl.textContent =
+        "🤝 Deu velha! Empate.";
+
+    }
+
+    else {
+
+      const turnName =
+        s.turn === "X"
+          ? s.players.X
+          : s.players.O;
+
+
+      if (s.turn === mySymbol) {
+
+        turnEl.textContent =
+          "👉 É a sua vez!";
+
+      }
+      else {
+
+        turnEl.textContent =
+          `⏳ Vez de ${turnName}`;
+
+      }
+
+    }
+
+  }
+
+
+  socket.on(
+    "state",
+    render
+  );
+
+
+  /*
+   * JOGADOR DESCONECTADO
+   */
+
+  socket.on(
+    "playerDisconnected",
+    ({ symbol }) => {
+
+      setGameMessage(
+        `O jogador ${symbol} saiu ou perdeu a conexão.`
+      );
+
+    }
+  );
+
+
+  /*
+   * NOVA PARTIDA
+   */
+
+  document.getElementById(
+    "restart"
+  ).onclick = () => {
+
+    socket.emit(
+      "restart",
+      (res) => {
+
+        if (!res?.ok) {
+
+          setGameMessage(
+            res?.error ||
+            "Não foi possível reiniciar."
+          );
+
+        }
+
+      }
+    );
+
+  };
+
+
+  /*
+   * ZERAR PLACAR
+   */
+
+  document.getElementById(
+    "resetScores"
+  ).onclick = () => {
+
+    if (
+      !confirm(
+        "Zerar o placar e começar uma nova partida?"
+      )
+    ) {
+
+      return;
+
+    }
+
+
+    socket.emit(
+      "resetScores",
+      (res) => {
+
+        if (!res?.ok) {
+
+          setGameMessage(
+            res?.error ||
+            "Não foi possível zerar."
+          );
+
+        }
+
+      }
+    );
+
+  };
+
+
+  /*
+   * COPIAR CÓDIGO
+   */
+
+  document.getElementById(
+    "copy"
+  ).onclick = async () => {
+
+    if (!currentRoom) return;
+
+
+    try {
+
+      await navigator.clipboard.writeText(
+        currentRoom
+      );
+
+
+      setGameMessage(
+        "Código copiado! Envie para seu amigo."
+      );
+
+    }
+    catch {
+
+      setGameMessage(
+        "Código da sala: " +
+        currentRoom
+      );
+
+    }
+
+  };
+
+
+  /*
+   * SAIR
+   */
+
+  document.getElementById(
+    "leave"
+  ).onclick = () => {
+
+    location.reload();
+
+  };
+
+
+  /*
+   * FORMATAÇÃO DO CÓDIGO
+   */
+
+  roomInput.addEventListener(
+    "input",
+    () => {
+
+      roomInput.value =
+        roomInput.value
+          .toUpperCase()
+          .replace(
+            /[^A-Z0-9]/g,
+            ""
+          )
+          .slice(0, 5);
+
+    }
+  );
+
+
+  /*
+   * ERRO DE CONEXÃO
+   */
+
+  socket.on(
+    "connect_error",
+    () => {
+
+      setLobbyMessage(
+        "Não foi possível conectar ao servidor."
+      );
+
+    }
+  );
+
+</script>
+
+</body>
+  </html>
