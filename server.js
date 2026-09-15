@@ -124,17 +124,38 @@ io.on("connection", (socket) => {
       return;
     }
 
-    if (room.players.O) {
-      callback?.({ ok: false, error: "Essa sala já está cheia." });
+    i    let symbol;
+
+    if (!room.players.X) {
+      symbol = "X";
+      room.players.X = {
+        id: socket.id,
+        name: cleanName(name)
+      };
+    } else if (!room.players.O) {
+      symbol = "O";
+      room.players.O = {
+        id: socket.id,
+        name: cleanName(name)
+      };
+    } else {
+      callback?.({
+        ok: false,
+        error: "Essa sala já está cheia."
+      });
       return;
     }
 
-    room.players.O = { id: socket.id, name: cleanName(name) };
     socket.join(roomCode);
     socket.data.room = roomCode;
-    socket.data.symbol = "O";
+    socket.data.symbol = symbol;
 
-    callback?.({ ok: true, code: roomCode, symbol: "O" });
+    callback?.({
+      ok: true,
+      code: roomCode,
+      symbol
+    });
+
     emitRoom(room);
   });
 
